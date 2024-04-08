@@ -8,12 +8,28 @@
 import Charts
 import SwiftUI
 
+//class ChartDataModel: ObservableObject {
+//  @Published var data: [StockDataPoint] = [StockDataPoint]()
+//  
+//  func updateData(newData: [StockDataPoint]) {
+//    self.data = newData
+//  }
+//}
+
+class ChartViewModel: ObservableObject {
+  @Published var data: [StockDataPoint] = [StockDataPoint]()
+  
+  func updateData(newData: [StockDataPoint]) {
+    self.data = newData
+  }
+}
+
 struct ChartView: View {
   
-  var data: [StockDataPoint]
+  @ObservedObject var viewModel = ChartViewModel()
   
   var body: some View {
-    Chart(data) { dp in 
+    Chart(viewModel.data) { dp in
       LineMark(
         x: .value("픽셀 밝기 값", dp.r),
         y: .value("픽셀의 수", dp.n)
@@ -31,6 +47,7 @@ struct ChartView: View {
       AxisMarks(preset: .aligned, position: .leading)
     }
     .chartLegend(.visible)
+    .onAppear()
   }
   
 }

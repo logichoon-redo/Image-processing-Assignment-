@@ -13,13 +13,14 @@ class ViewController: UIViewController {
   
   // MARK: - Properties
   // UI Properties
-  let inputImageView: UIImageView = {
+  let mainImageView: UIImageView = {
     let imageView = UIImageView()
     imageView.image = UIImage(named: "test image")
     return imageView
   }()
   let equalButton: UIButton = {
     let button = UIButton()
+    
     button.setTitle("Let's Equalization!🚀", for: .normal)
     button.backgroundColor = .black
     button.layer.cornerRadius = 20
@@ -39,29 +40,49 @@ class ViewController: UIViewController {
   // histogram Properties
   var histData: [StockDataPoint] = [StockDataPoint]() {
     didSet {
-      histChartView = ChartView(data: self.histData)
-      histHostingController = UIHostingController(rootView: histChartView)
+      histChartView.viewModel.updateData(newData: histData)
     }
   }
   var sumData: [StockDataPoint] = [StockDataPoint]() {
     didSet {
-      sumChartView = ChartView(data: self.sumData)
-      sumHostingController = UIHostingController(rootView: sumChartView)
+      sumChartView.viewModel.updateData(newData: sumData)
     }
   }
   var histChartView: ChartView!
   var histHostingController: UIHostingController<ChartView>!
   var sumChartView: ChartView!
   var sumHostingController: UIHostingController<ChartView>!
+  var pixelData = [UInt8](repeating: 0, count: 256 * 256 * 4)
+  var rLookUpTable = [Int: Int]()
+  var gLookUpTable = [Int: Int]()
+  var bLookUpTable = [Int: Int]()
   
   // MARK: - LifeCycle
   
   override func viewDidLoad() {
     super.viewDidLoad()
     
+    histChartView = ChartView()
+    histHostingController = UIHostingController(rootView: histChartView)
+    sumChartView = ChartView()
+    sumHostingController = UIHostingController(rootView: sumChartView)
+    
     self.initHistogram(image: UIImage(named: "test image")!)
     
+    self.setTarget()
     self.configureSubviews()
+  }
+  
+  // MARK: - ButtonMethod
+  
+  func setTarget() {
+    equalButton.addTarget(self, action: #selector(tappedEqualButton), for: .touchUpInside)
+  }
+  
+  @objc func tappedEqualButton() {
+    guard let cgImage = self.histogramEqualization(sumData: sumData) else { print("image nil"); return }
+    self.mainImageView.image = UIImage(cgImage: cgImage)
+    self.equalButton.setTitle("Successful!🎯", for: .normal)
   }
   
   // MARK: - Histogram Init
@@ -72,7 +93,6 @@ class ViewController: UIViewController {
     let height = cgImage.height
     let colorSpace = CGColorSpaceCreateDeviceRGB()
     let bytePerRow = 4 * width
-    var pixelData = [UInt8](repeating: 0, count: width * height * 4)
     
     let context = CGContext(data: &pixelData,
                             width: width,
@@ -84,6 +104,59 @@ class ViewController: UIViewController {
     
     context?.draw(cgImage, in: CGRect(x: 0, y: 0, width: width, height: height))
     
+    createHistAndSum(pixelData: pixelData, height: height, width: width)
+  }
+  
+  // MARK: - HistogramEqualization
+  
+  func histogramEqualization(sumData: [StockDataPoint]) -> CGImage? {
+    
+    _=(0...255).map { i in
+      rLookUpTable[sumData[i].r] = Int(round((255.0 / 65536.0) * Double(sumData[i].n)))
+    }
+    _=(256...511).map { i in
+      gLookUpTable[sumData[i].r] = Int(round((255.0 / 65536.0) * Double(sumData[i].n)))
+    }
+    _=(512...767).map { i in
+      bLookUpTable[sumData[i].r] = Int(round((255.0 / 65536.0) * Double(sumData[i].n)))
+    }
+    
+    for i in stride(from: 0, to: pixelData.count, by: 4) {
+      pixelData[i] = UInt8(rLookUpTable[Int(exactly: pixelData[i])!]!)
+    }
+    for i in stride(from: 1, to: pixelData.count, by: 4) {
+      pixelData[i] = UInt8(gLookUpTable[Int(exactly: pixelData[i])!]!)
+    }
+    for i in stride(from: 2, to: pixelData.count, by: 4) {
+      pixelData[i] = UInt8(bLookUpTable[Int(exactly: pixelData[i])!]!)
+    }
+    for i in stride(from: 3, to: pixelData.count, by: 4) {
+      pixelData[i] = 255
+    }
+    
+    createHistAndSum(pixelData: pixelData, height: 256, width: 256)
+    
+    // 이미지 출력
+    guard let providerRef = CGDataProvider(data: Data(pixelData) as CFData) else { print("no data"); return nil }
+    
+    let cgImgae = CGImage(width: 256,
+                          height: 256,
+                          bitsPerComponent: 8,
+                          bitsPerPixel: 4 * 8,
+                          bytesPerRow: 4 * 256,
+                          space: CGColorSpaceCreateDeviceRGB(),
+                          bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue),
+                          provider: providerRef,
+                          decode: nil,
+                          shouldInterpolate: true,
+                          intent: .defaultIntent)
+    
+    return cgImgae
+  }
+  
+  // MARK: - createHistAndSum
+  
+  func createHistAndSum(pixelData: [UInt8], height: Int, width: Int) {
     var rHistogram = [Int](repeating: 0, count: 256)
     var gHistogram = [Int](repeating: 0, count: 256)
     var bHistogram = [Int](repeating: 0, count: 256)
@@ -91,7 +164,7 @@ class ViewController: UIViewController {
     for y in 0..<height {
       for x in 0..<width {
         let offset = (y * width + x) * 4
-        let red = pixelData[offset]
+        let red = pixelData[offset] // error!
         let green = pixelData[offset + 1]
         let blue = pixelData[offset + 2]
         
@@ -101,40 +174,46 @@ class ViewController: UIViewController {
       }
     }
     
+    var tempHistData = [StockDataPoint]()
+    var tempSumData = [StockDataPoint]()
     var sumRHistogram = 0
     var sumGHistogram = 0
     var sumBHistogram = 0
     
     _=(0..<rHistogram.count).map { i in
-      histData.append(StockDataPoint(r: i, n: rHistogram[i], stockID: "red"))
+      tempHistData.append(StockDataPoint(r: i, n: rHistogram[i], stockID: "red"))
       sumRHistogram += rHistogram[i]
-      sumData.append(StockDataPoint(r: i, n: sumRHistogram, stockID: "red"))
+      tempSumData.append(StockDataPoint(r: i, n: sumRHistogram, stockID: "red"))
     }
     _=(0..<gHistogram.count).map { i in
-      histData.append(StockDataPoint(r: i, n: gHistogram[i], stockID: "green"))
+      tempHistData.append(StockDataPoint(r: i, n: gHistogram[i], stockID: "green"))
       sumGHistogram += gHistogram[i]
-      sumData.append(StockDataPoint(r: i, n: sumGHistogram, stockID: "green"))
+      tempSumData.append(StockDataPoint(r: i, n: sumGHistogram, stockID: "green"))
     }
     _=(0..<bHistogram.count).map { i in
-      histData.append(StockDataPoint(r: i, n: bHistogram[i], stockID: "blue"))
+      tempHistData.append(StockDataPoint(r: i, n: bHistogram[i], stockID: "blue"))
       sumBHistogram += bHistogram[i]
-      sumData.append(StockDataPoint(r: i, n: sumBHistogram, stockID: "blue"))
+      tempSumData.append(StockDataPoint(r: i, n: sumBHistogram, stockID: "blue"))
     }
     
-    print("histRed: \(histData.filter { $0.stockID == "red" }.map { $0.n })")
-    print("histGreen: \(histData.filter { $0.stockID == "green" }.map { $0.n })")
-    print("histBlue: \(histData.filter { $0.stockID == "blue" }.map { $0.n })")
+    // Chart Update
+    histData = tempHistData
+    sumData = tempSumData
     
-    print("--------------------------------------------------------------------------------------")
+    print("histRed: \(tempHistData.filter { $0.stockID == "red" }.map { $0.n })")
+    print("histGreen: \(tempHistData.filter { $0.stockID == "green" }.map { $0.n })")
+    print("histBlue: \(tempHistData.filter { $0.stockID == "blue" }.map { $0.n })")
     
-    print("sumRed: \(sumData.filter { $0.stockID == "red" }.map { $0.n })")
-    print("sumGreen: \(sumData.filter { $0.stockID == "green" }.map { $0.n })")
-    print("sumBlue: \(sumData.filter { $0.stockID == "blue" }.map { $0.n })")
+    print("sumRed: \(tempSumData.filter { $0.stockID == "red" }.map { $0.n })")
+    print("sumGreen: \(tempSumData.filter { $0.stockID == "green" }.map { $0.n })")
+    print("sumBlue: \(tempSumData.filter { $0.stockID == "blue" }.map { $0.n })")
+    
+    print("---------------------------------------------------------------------------------------------")
   }
   
 }
 
-// MARK: - ViewController
+// MARK: - LayoutSupport
 
 extension ViewController: LayoutSupport {
   
@@ -144,7 +223,7 @@ extension ViewController: LayoutSupport {
   }
   
   func addSubviews() {
-    self.view.addSubview(self.inputImageView)
+    self.view.addSubview(self.mainImageView)
     
     addChild(self.histHostingController)
     self.view.addSubview(self.histHostingController.view)
@@ -160,14 +239,14 @@ extension ViewController: LayoutSupport {
   }
   
   func setupSubviewsConstraints() {
-    self.inputImageView.snp.makeConstraints {
+    self.mainImageView.snp.makeConstraints {
       $0.centerX.equalToSuperview()
       $0.top.equalToSuperview().offset(90)
     }
     
     self.histHostingController.view.snp.makeConstraints {
       $0.centerX.equalToSuperview()
-      $0.top.equalTo(self.inputImageView.snp.bottom).offset(40)
+      $0.top.equalTo(self.mainImageView.snp.bottom).offset(40)
       $0.height.equalTo(150)
       $0.width.equalTo(250)
     }
@@ -181,7 +260,7 @@ extension ViewController: LayoutSupport {
     
     self.equalButton.snp.makeConstraints {
       $0.centerX.equalToSuperview()
-      $0.top.equalTo(self.sumHostingController.view.snp.bottom).offset(40)
+      $0.top.equalTo(self.sumHostingController.view.snp.bottom).offset(30)
       $0.height.equalTo(50)
       $0.width.equalTo(200)
     }
