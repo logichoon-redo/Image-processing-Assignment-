@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		4B7F769A2BC27395000DB894 /* Charts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B7F76992BC27395000DB894 /* Charts.framework */; };
 		4B7F769C2BC273B0000DB894 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7F769B2BC273B0000DB894 /* ChartView.swift */; };
-		4B7F769E2BC27638000DB894 /* StockDataPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7F769D2BC27638000DB894 /* StockDataPoint.swift */; };
+		4B7F769E2BC27638000DB894 /* HistDataPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7F769D2BC27638000DB894 /* HistDataPoint.swift */; };
 		4BAFE2BD2BC266D4000DC117 /* LayoutSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAFE2BC2BC266D4000DC117 /* LayoutSupport.swift */; };
 		4BAFE2BF2BC26714000DC117 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4BAFE2BE2BC26714000DC117 /* SnapKit */; };
 		4BAFE2C12BC26718000DC117 /* SnapKit-Dynamic in Frameworks */ = {isa = PBXBuildFile; productRef = 4BAFE2C02BC26718000DC117 /* SnapKit-Dynamic */; };
@@ -17,9 +17,7 @@
 		4BCF42F02BC1C7A600217F7E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF42EF2BC1C7A600217F7E /* AppDelegate.swift */; };
 		4BCF42F22BC1C7A600217F7E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF42F12BC1C7A600217F7E /* SceneDelegate.swift */; };
 		4BCF42F42BC1C7A600217F7E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF42F32BC1C7A600217F7E /* ViewController.swift */; };
-		4BCF42F72BC1C7A600217F7E /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 4BCF42F62BC1C7A600217F7E /* Base */; };
 		4BCF42F92BC1C7A700217F7E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4BCF42F82BC1C7A700217F7E /* Assets.xcassets */; };
-		4BCF42FC2BC1C7A700217F7E /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 4BCF42FB2BC1C7A700217F7E /* Base */; };
 		4BCF43072BC1C7A700217F7E /* Histogram_EqualizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF43062BC1C7A700217F7E /* Histogram_EqualizationTests.swift */; };
 		4BCF43112BC1C7A700217F7E /* Histogram_EqualizationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF43102BC1C7A700217F7E /* Histogram_EqualizationUITests.swift */; };
 		4BCF43132BC1C7A700217F7E /* Histogram_EqualizationUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF43122BC1C7A700217F7E /* Histogram_EqualizationUITestsLaunchTests.swift */; };
@@ -59,15 +57,13 @@
 /* Begin PBXFileReference section */
 		4B7F76992BC27395000DB894 /* Charts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Charts.framework; path = System/Library/Frameworks/Charts.framework; sourceTree = SDKROOT; };
 		4B7F769B2BC273B0000DB894 /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
-		4B7F769D2BC27638000DB894 /* StockDataPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockDataPoint.swift; sourceTree = "<group>"; };
+		4B7F769D2BC27638000DB894 /* HistDataPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistDataPoint.swift; sourceTree = "<group>"; };
 		4BAFE2BC2BC266D4000DC117 /* LayoutSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutSupport.swift; sourceTree = "<group>"; };
 		4BCF42EC2BC1C7A600217F7E /* Histogram_Equalization.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Histogram_Equalization.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BCF42EF2BC1C7A600217F7E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4BCF42F12BC1C7A600217F7E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		4BCF42F32BC1C7A600217F7E /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		4BCF42F62BC1C7A600217F7E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		4BCF42F82BC1C7A700217F7E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		4BCF42FB2BC1C7A700217F7E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		4BCF42FD2BC1C7A700217F7E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4BCF43022BC1C7A700217F7E /* Histogram_EqualizationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Histogram_EqualizationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BCF43062BC1C7A700217F7E /* Histogram_EqualizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Histogram_EqualizationTests.swift; sourceTree = "<group>"; };
@@ -104,12 +100,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4B3822DF2BC5591A00E43726 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				4BCF42FD2BC1C7A700217F7E /* Info.plist */,
+				4BCF42F82BC1C7A700217F7E /* Assets.xcassets */,
+				4BCF42F12BC1C7A600217F7E /* SceneDelegate.swift */,
+				4BCF42EF2BC1C7A600217F7E /* AppDelegate.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
 		4B7F76982BC27350000DB894 /* Feature */ = {
 			isa = PBXGroup;
 			children = (
 				4BCF42F32BC1C7A600217F7E /* ViewController.swift */,
 				4B7F769B2BC273B0000DB894 /* ChartView.swift */,
-				4B7F769D2BC27638000DB894 /* StockDataPoint.swift */,
+				4B7F769D2BC27638000DB894 /* HistDataPoint.swift */,
 			);
 			path = Feature;
 			sourceTree = "<group>";
@@ -117,8 +124,6 @@
 		4BAFE2BB2BC26679000DC117 /* Common */ = {
 			isa = PBXGroup;
 			children = (
-				4BCF42EF2BC1C7A600217F7E /* AppDelegate.swift */,
-				4BCF42F12BC1C7A600217F7E /* SceneDelegate.swift */,
 				4BAFE2BC2BC266D4000DC117 /* LayoutSupport.swift */,
 			);
 			path = Common;
@@ -148,12 +153,9 @@
 		4BCF42EE2BC1C7A600217F7E /* Histogram_Equalization */ = {
 			isa = PBXGroup;
 			children = (
-				4B7F76982BC27350000DB894 /* Feature */,
 				4BAFE2BB2BC26679000DC117 /* Common */,
-				4BCF42F52BC1C7A600217F7E /* Main.storyboard */,
-				4BCF42F82BC1C7A700217F7E /* Assets.xcassets */,
-				4BCF42FA2BC1C7A700217F7E /* LaunchScreen.storyboard */,
-				4BCF42FD2BC1C7A700217F7E /* Info.plist */,
+				4B7F76982BC27350000DB894 /* Feature */,
+				4B3822DF2BC5591A00E43726 /* Support */,
 			);
 			path = Histogram_Equalization;
 			sourceTree = "<group>";
@@ -296,8 +298,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4BCF42F92BC1C7A700217F7E /* Assets.xcassets in Resources */,
-				4BCF42FC2BC1C7A700217F7E /* Base in Resources */,
-				4BCF42F72BC1C7A600217F7E /* Base in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -323,7 +323,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4BCF42F42BC1C7A600217F7E /* ViewController.swift in Sources */,
-				4B7F769E2BC27638000DB894 /* StockDataPoint.swift in Sources */,
+				4B7F769E2BC27638000DB894 /* HistDataPoint.swift in Sources */,
 				4BAFE2BD2BC266D4000DC117 /* LayoutSupport.swift in Sources */,
 				4BCF42F02BC1C7A600217F7E /* AppDelegate.swift in Sources */,
 				4B7F769C2BC273B0000DB894 /* ChartView.swift in Sources */,
@@ -362,25 +362,6 @@
 			targetProxy = 4BCF430D2BC1C7A700217F7E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		4BCF42F52BC1C7A600217F7E /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				4BCF42F62BC1C7A600217F7E /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		4BCF42FA2BC1C7A700217F7E /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				4BCF42FB2BC1C7A700217F7E /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		4BCF43142BC1C7A700217F7E /* Debug */ = {
@@ -514,9 +495,9 @@
 				INFOPLIST_FILE = Histogram_Equalization/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -538,18 +519,20 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = GHGPAZGBBT;
+				EXCLUDED_ARCHS = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Histogram_Equalization/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "ChiHoonLee.Histogram-Equalization";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

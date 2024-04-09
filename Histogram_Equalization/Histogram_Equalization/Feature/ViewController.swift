@@ -20,8 +20,7 @@ class ViewController: UIViewController {
   }()
   let equalButton: UIButton = {
     let button = UIButton()
-    
-    button.setTitle("Let's Equalization!🚀", for: .normal)
+    button.setTitle("Let's Equalization! 🚀", for: .normal)
     button.backgroundColor = .black
     button.layer.cornerRadius = 20
     return button
@@ -38,12 +37,12 @@ class ViewController: UIViewController {
   }()
   
   // histogram Properties
-  var histData: [StockDataPoint] = [StockDataPoint]() {
+  var histData: [HistDataPoint] = [HistDataPoint]() {
     didSet {
       histChartView.viewModel.updateData(newData: histData)
     }
   }
-  var sumData: [StockDataPoint] = [StockDataPoint]() {
+  var sumData: [HistDataPoint] = [HistDataPoint]() {
     didSet {
       sumChartView.viewModel.updateData(newData: sumData)
     }
@@ -62,6 +61,9 @@ class ViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     
+    self.view.backgroundColor = .white
+    
+    // 그래프 생성
     histChartView = ChartView()
     histHostingController = UIHostingController(rootView: histChartView)
     sumChartView = ChartView()
@@ -82,12 +84,13 @@ class ViewController: UIViewController {
   @objc func tappedEqualButton() {
     guard let cgImage = self.histogramEqualization(sumData: sumData) else { print("image nil"); return }
     self.mainImageView.image = UIImage(cgImage: cgImage)
-    self.equalButton.setTitle("Successful!🎯", for: .normal)
+    self.equalButton.setTitle("Successful! 🎯", for: .normal)
   }
   
   // MARK: - Histogram Init
   
   func initHistogram(image: UIImage) {
+    // 이미지를 픽셀데이터(UInt8)로 전환!
     guard let cgImage = image.cgImage else { return }
     let width = cgImage.width
     let height = cgImage.height
@@ -109,9 +112,11 @@ class ViewController: UIViewController {
   
   // MARK: - HistogramEqualization
   
-  func histogramEqualization(sumData: [StockDataPoint]) -> CGImage? {
+  func histogramEqualization(sumData: [HistDataPoint]) -> CGImage? {
     
+    // round(((L - 1) / MN) * sum) histogram equalization
     _=(0...255).map { i in
+      // LookUpTable에 변경값 저장
       rLookUpTable[sumData[i].r] = Int(round((255.0 / 65536.0) * Double(sumData[i].n)))
     }
     _=(256...511).map { i in
@@ -121,6 +126,7 @@ class ViewController: UIViewController {
       bLookUpTable[sumData[i].r] = Int(round((255.0 / 65536.0) * Double(sumData[i].n)))
     }
     
+    // 변경(histogram equalization)된 픽셀데이터 생성
     for i in stride(from: 0, to: pixelData.count, by: 4) {
       pixelData[i] = UInt8(rLookUpTable[Int(exactly: pixelData[i])!]!)
     }
@@ -131,12 +137,12 @@ class ViewController: UIViewController {
       pixelData[i] = UInt8(bLookUpTable[Int(exactly: pixelData[i])!]!)
     }
     for i in stride(from: 3, to: pixelData.count, by: 4) {
-      pixelData[i] = 255
+      pixelData[i] = 255 // alpha
     }
     
     createHistAndSum(pixelData: pixelData, height: 256, width: 256)
     
-    // 이미지 출력
+    // CG이미지 생성
     guard let providerRef = CGDataProvider(data: Data(pixelData) as CFData) else { print("no data"); return nil }
     
     let cgImgae = CGImage(width: 256,
@@ -164,49 +170,53 @@ class ViewController: UIViewController {
     for y in 0..<height {
       for x in 0..<width {
         let offset = (y * width + x) * 4
-        let red = pixelData[offset] // error!
+        let red = pixelData[offset]
         let green = pixelData[offset + 1]
         let blue = pixelData[offset + 2]
         
+        // 히스토그램 생성(밝기값(r)별 픽셀의 개수(n) count)
         rHistogram[Int(red)] += 1
         gHistogram[Int(green)] += 1
         bHistogram[Int(blue)] += 1
       }
     }
     
-    var tempHistData = [StockDataPoint]()
-    var tempSumData = [StockDataPoint]()
+    var tempHistData = [HistDataPoint]()
+    var tempSumData = [HistDataPoint]()
     var sumRHistogram = 0
     var sumGHistogram = 0
     var sumBHistogram = 0
     
     _=(0..<rHistogram.count).map { i in
-      tempHistData.append(StockDataPoint(r: i, n: rHistogram[i], stockID: "red"))
+      //
+      tempHistData.append(HistDataPoint(r: i, n: rHistogram[i], rgbID: "red"))
+      
+      // 누적 분포 함수 계산
       sumRHistogram += rHistogram[i]
-      tempSumData.append(StockDataPoint(r: i, n: sumRHistogram, stockID: "red"))
+      tempSumData.append(HistDataPoint(r: i, n: sumRHistogram, rgbID: "red"))
     }
     _=(0..<gHistogram.count).map { i in
-      tempHistData.append(StockDataPoint(r: i, n: gHistogram[i], stockID: "green"))
+      tempHistData.append(HistDataPoint(r: i, n: gHistogram[i], rgbID: "green"))
       sumGHistogram += gHistogram[i]
-      tempSumData.append(StockDataPoint(r: i, n: sumGHistogram, stockID: "green"))
+      tempSumData.append(HistDataPoint(r: i, n: sumGHistogram, rgbID: "green"))
     }
     _=(0..<bHistogram.count).map { i in
-      tempHistData.append(StockDataPoint(r: i, n: bHistogram[i], stockID: "blue"))
+      tempHistData.append(HistDataPoint(r: i, n: bHistogram[i], rgbID: "blue"))
       sumBHistogram += bHistogram[i]
-      tempSumData.append(StockDataPoint(r: i, n: sumBHistogram, stockID: "blue"))
+      tempSumData.append(HistDataPoint(r: i, n: sumBHistogram, rgbID: "blue"))
     }
     
-    // Chart Update
+    // Chart Update (didSet 실행)
     histData = tempHistData
     sumData = tempSumData
     
-    print("histRed: \(tempHistData.filter { $0.stockID == "red" }.map { $0.n })")
-    print("histGreen: \(tempHistData.filter { $0.stockID == "green" }.map { $0.n })")
-    print("histBlue: \(tempHistData.filter { $0.stockID == "blue" }.map { $0.n })")
+    print("histRed: \(tempHistData.filter { $0.rgbID == "red" }.map { $0.n })")
+    print("histGreen: \(tempHistData.filter { $0.rgbID == "green" }.map { $0.n })")
+    print("histBlue: \(tempHistData.filter { $0.rgbID == "blue" }.map { $0.n })")
     
-    print("sumRed: \(tempSumData.filter { $0.stockID == "red" }.map { $0.n })")
-    print("sumGreen: \(tempSumData.filter { $0.stockID == "green" }.map { $0.n })")
-    print("sumBlue: \(tempSumData.filter { $0.stockID == "blue" }.map { $0.n })")
+    print("sumRed: \(tempSumData.filter { $0.rgbID == "red" }.map { $0.n })")
+    print("sumGreen: \(tempSumData.filter { $0.rgbID == "green" }.map { $0.n })")
+    print("sumBlue: \(tempSumData.filter { $0.rgbID == "blue" }.map { $0.n })")
     
     print("---------------------------------------------------------------------------------------------")
   }

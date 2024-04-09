@@ -8,18 +8,10 @@
 import Charts
 import SwiftUI
 
-//class ChartDataModel: ObservableObject {
-//  @Published var data: [StockDataPoint] = [StockDataPoint]()
-//  
-//  func updateData(newData: [StockDataPoint]) {
-//    self.data = newData
-//  }
-//}
-
 class ChartViewModel: ObservableObject {
-  @Published var data: [StockDataPoint] = [StockDataPoint]()
+  @Published var data: [HistDataPoint] = [HistDataPoint]()
   
-  func updateData(newData: [StockDataPoint]) {
+  func updateData(newData: [HistDataPoint]) {
     self.data = newData
   }
 }
@@ -34,7 +26,7 @@ struct ChartView: View {
         x: .value("픽셀 밝기 값", dp.r),
         y: .value("픽셀의 수", dp.n)
       )
-      .foregroundStyle(by: .value("Stock ID", dp.stockID))
+      .foregroundStyle(by: .value("rgb ID", dp.rgbID))
       
     }
     .chartForegroundStyleScale([
