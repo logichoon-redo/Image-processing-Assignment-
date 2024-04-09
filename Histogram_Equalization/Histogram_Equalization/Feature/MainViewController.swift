@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  MainViewController.swift
 //  Histogram_Equalization
 //
 //  Created by 이치훈 on 4/7/24.
@@ -9,7 +9,7 @@ import SnapKit
 import SwiftUI
 import UIKit
 
-class ViewController: UIViewController {
+class MainViewController: UIViewController {
   
   // MARK: - Properties
   // UI Properties
@@ -225,7 +225,7 @@ class ViewController: UIViewController {
 
 // MARK: - LayoutSupport
 
-extension ViewController: LayoutSupport {
+extension MainViewController: LayoutSupport {
   
   func configureSubviews() {
     addSubviews()
