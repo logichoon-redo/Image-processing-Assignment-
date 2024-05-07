@@ -35,6 +35,10 @@ class MainViewController: UIViewController {
     label.text = "Sum"
     return label
   }()
+  var histChartView: ChartView!
+  var histHostingController: UIHostingController<ChartView>!
+  var sumChartView: ChartView!
+  var sumHostingController: UIHostingController<ChartView>!
   
   // histogram Properties
   var histData: [HistDataPoint] = [HistDataPoint]() {
@@ -47,14 +51,10 @@ class MainViewController: UIViewController {
       sumChartView.viewModel.updateData(newData: sumData)
     }
   }
-  var histChartView: ChartView!
-  var histHostingController: UIHostingController<ChartView>!
-  var sumChartView: ChartView!
-  var sumHostingController: UIHostingController<ChartView>!
+  
   var pixelData = [UInt8](repeating: 0, count: 256 * 256 * 4)
-  var rLookUpTable = [Int: Int]()
-  var gLookUpTable = [Int: Int]()
-  var bLookUpTable = [Int: Int]()
+  var yCbCrPixelData = [YCbCrItem]()
+  var lookUpTable = [Int](repeating: 0, count: 256)
   
   // MARK: - LifeCycle
   
@@ -64,10 +64,10 @@ class MainViewController: UIViewController {
     self.view.backgroundColor = .white
     
     // 그래프 생성
-    histChartView = ChartView()
-    histHostingController = UIHostingController(rootView: histChartView)
-    sumChartView = ChartView()
-    sumHostingController = UIHostingController(rootView: sumChartView)
+    self.histChartView = ChartView()
+    self.histHostingController = UIHostingController(rootView: histChartView)
+    self.sumChartView = ChartView()
+    self.sumHostingController = UIHostingController(rootView: sumChartView)
     
     self.initHistogram(image: UIImage(named: "test image")!)
     
@@ -82,7 +82,7 @@ class MainViewController: UIViewController {
   }
   
   @objc func tappedEqualButton() {
-    guard let cgImage = self.histogramEqualization(sumData: sumData) else { print("image nil"); return }
+    guard let cgImage = self.histogramEqualization() else { print("image nil"); return }
     self.mainImageView.image = UIImage(cgImage: cgImage)
     self.equalButton.setTitle("Successful! 🎯", for: .normal)
   }
@@ -107,41 +107,27 @@ class MainViewController: UIViewController {
     
     context?.draw(cgImage, in: CGRect(x: 0, y: 0, width: width, height: height))
     
-    createHistAndSum(pixelData: pixelData, height: height, width: width)
+    self.createHistAndSum(pixelData: pixelData, height: height, width: width)
   }
   
   // MARK: - HistogramEqualization
   
-  func histogramEqualization(sumData: [HistDataPoint]) -> CGImage? {
-    
+  func histogramEqualization() -> CGImage? {
     // round(((L - 1) / MN) * sum_i) histogram equalization
     _=(0...255).map { i in
       // LookUpTable에 변경값 저장
-      rLookUpTable[sumData[i].r] = Int(round((255.0 / 65536.0) * Double(sumData[i].n)))
-    }
-    _=(256...511).map { i in
-      gLookUpTable[sumData[i].r] = Int(round((255.0 / 65536.0) * Double(sumData[i].n)))
-    }
-    _=(512...767).map { i in
-      bLookUpTable[sumData[i].r] = Int(round((255.0 / 65536.0) * Double(sumData[i].n)))
+      self.lookUpTable[i] = Int(round((255.0 / 65536.0) * Double(self.sumData[i].n)))
     }
     
     // 변경(histogram equalization)된 픽셀데이터 LookUpTable에 참조해 업데이트
     // 여기서 참조되는 pixelData는 원본 이미지영상을 참조한 데이터임
-    for i in stride(from: 0, to: pixelData.count, by: 4) {
-      pixelData[i] = UInt8(rLookUpTable[Int(exactly: pixelData[i])!]!)
-    }
-    for i in stride(from: 1, to: pixelData.count, by: 4) {
-      pixelData[i] = UInt8(gLookUpTable[Int(exactly: pixelData[i])!]!)
-    }
-    for i in stride(from: 2, to: pixelData.count, by: 4) {
-      pixelData[i] = UInt8(bLookUpTable[Int(exactly: pixelData[i])!]!)
-    }
-    for i in stride(from: 3, to: pixelData.count, by: 4) {
-      pixelData[i] = 255 // alpha
+    _=(0..<self.yCbCrPixelData.count).map { i in
+      self.yCbCrPixelData[i].y = UInt8(lookUpTable[Int(self.yCbCrPixelData[i].y)])
     }
     
-    createHistAndSum(pixelData: pixelData, height: 256, width: 256)
+    self.pixelData = changeYCbCrtoRGB(yCbCrPixelData: self.yCbCrPixelData)
+    
+    self.createHistAndSum(pixelData: pixelData, height: 256, width: 256)
     
     // CG이미지 생성
     guard let providerRef = CGDataProvider(data: Data(pixelData) as CFData) else { print("no data"); return nil }
@@ -164,62 +150,82 @@ class MainViewController: UIViewController {
   // MARK: - createHistAndSum
   
   func createHistAndSum(pixelData: [UInt8], height: Int, width: Int) {
-    var rHistogram = [Int](repeating: 0, count: 256)
-    var gHistogram = [Int](repeating: 0, count: 256)
-    var bHistogram = [Int](repeating: 0, count: 256)
+    var histogram = [Int](repeating: 0, count: 256)
+    var histogramSum = 0
+    var tempHistData = [HistDataPoint]()
+    var tempSumData = [HistDataPoint]()
+    
+    self.yCbCrPixelData = self.changeRGBtoYCbCr(pixelData: pixelData, height: height, width: width)
+    
+    _=self.yCbCrPixelData.map {
+      histogram[Int($0.y)] += 1
+    }
+    
+    _=(0...255).map { i in
+      tempHistData.append(HistDataPoint(r: i, n: histogram[i], rgbID: "y"))
+      
+      // 누적 분포 함수 계산
+      histogramSum += histogram[i]
+      tempSumData.append(HistDataPoint(r: i, n: histogramSum, rgbID: "y"))
+    }
+    
+    // Chart Update (didSet 실행)
+    self.histData = tempHistData
+    self.sumData = tempSumData
+    
+    print("Histogram: \(tempHistData)")
+    print("Sum: \(tempSumData)")
+    
+    print("---------------------------------------------------------------------------------------------")
+  }
+  
+  // MARK: - changeRGBtoYCbCr
+  
+  func changeRGBtoYCbCr(pixelData: [UInt8], height: Int, width: Int) -> [YCbCrItem] {
+    var yCbCrPixelData = [YCbCrItem]()
     
     for y in 0..<height {
       for x in 0..<width {
         // pixelData -> R, G, B, Alpha 값들이 순서대로 보관돼있음
+        var yCbCrItem = YCbCrItem()
         let offset = (y * width + x) * 4
         let red = pixelData[offset]
         let green = pixelData[offset + 1]
         let blue = pixelData[offset + 2]
         
-        // 히스토그램 생성(밝기값(r)별 픽셀의 개수(n) count)
-        rHistogram[Int(red)] += 1
-        gHistogram[Int(green)] += 1
-        bHistogram[Int(blue)] += 1
+        yCbCrItem.y = UInt8(0.299 * Double(red) + 0.587 * Double(green) + 0.114 * Double(blue))
+        yCbCrItem.c_b = UInt8(-0.169 * Double(red) - 0.331 * Double(green) + 0.5 * Double(blue) + 128.0)
+        yCbCrItem.c_r = UInt8(0.5 * Double(red) - 0.419 * Double(green) - 0.081 * Double(blue) + 128.0)
+        
+        yCbCrPixelData.append(yCbCrItem)
       }
     }
     
-    var tempHistData = [HistDataPoint]()
-    var tempSumData = [HistDataPoint]()
-    var sumRHistogram = 0
-    var sumGHistogram = 0
-    var sumBHistogram = 0
+    return yCbCrPixelData
+  }
+  
+  //MARK: - changeYCbCrtoRGM
+  
+  func changeYCbCrtoRGB(yCbCrPixelData: [YCbCrItem]) -> [UInt8] {
+    var pixelData = [UInt8]()
     
-    _=(0..<rHistogram.count).map { i in
-      tempHistData.append(HistDataPoint(r: i, n: rHistogram[i], rgbID: "red"))
+    _=yCbCrPixelData.map {
+      let y = Double($0.y)
+      let c_rMacro = Double($0.c_r) - 128.0
+      let c_bMacro = Double($0.c_b) - 128.0
       
-      // 누적 분포 함수 계산
-      sumRHistogram += rHistogram[i]
-      tempSumData.append(HistDataPoint(r: i, n: sumRHistogram, rgbID: "red"))
-    }
-    _=(0..<gHistogram.count).map { i in
-      tempHistData.append(HistDataPoint(r: i, n: gHistogram[i], rgbID: "green"))
-      sumGHistogram += gHistogram[i]
-      tempSumData.append(HistDataPoint(r: i, n: sumGHistogram, rgbID: "green"))
-    }
-    _=(0..<bHistogram.count).map { i in
-      tempHistData.append(HistDataPoint(r: i, n: bHistogram[i], rgbID: "blue"))
-      sumBHistogram += bHistogram[i]
-      tempSumData.append(HistDataPoint(r: i, n: sumBHistogram, rgbID: "blue"))
+      // 각 색상 값을 계산하고 클리핑하여 범위를 0-255 사이로 제한
+      let red = y + 1.402 * c_rMacro
+      let green = y - 0.344136 * c_bMacro - 0.714136 * c_rMacro
+      let blue = y + 1.772 * c_bMacro
+      
+      pixelData.append(UInt8(max(0, min(255, red))))
+      pixelData.append(UInt8(max(0, min(255, green))))
+      pixelData.append(UInt8(max(0, min(255, blue))))
+      pixelData.append(UInt8(255))
     }
     
-    // Chart Update (didSet 실행)
-    histData = tempHistData
-    sumData = tempSumData
-    
-    print("histRed: \(tempHistData.filter { $0.rgbID == "red" }.map { $0.n })")
-    print("histGreen: \(tempHistData.filter { $0.rgbID == "green" }.map { $0.n })")
-    print("histBlue: \(tempHistData.filter { $0.rgbID == "blue" }.map { $0.n })")
-    
-    print("sumRed: \(tempSumData.filter { $0.rgbID == "red" }.map { $0.n })")
-    print("sumGreen: \(tempSumData.filter { $0.rgbID == "green" }.map { $0.n })")
-    print("sumBlue: \(tempSumData.filter { $0.rgbID == "blue" }.map { $0.n })")
-    
-    print("---------------------------------------------------------------------------------------------")
+    return pixelData
   }
   
 }
