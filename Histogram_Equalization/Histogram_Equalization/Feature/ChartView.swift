@@ -29,9 +29,9 @@ struct ChartView: View {
       .foregroundStyle(by: .value("rgb ID", dp.rgbID))
       
     }
-    .chartForegroundStyleScale([
-      "red": .red, "green": .green, "blue": .blue
-    ])
+//    .chartForegroundStyleScale([
+//      "red": .red, "green": .green, "blue": .blue
+//    ])
     .chartXAxis {
       AxisMarks(preset: .aligned, position: .bottom)
     }
