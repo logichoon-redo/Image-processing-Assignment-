@@ -173,8 +173,8 @@ class MainViewController: UIViewController {
     self.histData = tempHistData
     self.sumData = tempSumData
     
-    print("Histogram: \(tempHistData)")
-    print("Sum: \(tempSumData)")
+    print("Histogram: \(tempHistData.map { $0.n })")
+    print("Sum: \(tempSumData.map { $0.n })")
     
     print("---------------------------------------------------------------------------------------------")
   }
