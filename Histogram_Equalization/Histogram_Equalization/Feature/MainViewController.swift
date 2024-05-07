@@ -114,7 +114,7 @@ class MainViewController: UIViewController {
   
   func histogramEqualization(sumData: [HistDataPoint]) -> CGImage? {
     
-    // round(((L - 1) / MN) * sum) histogram equalization
+    // round(((L - 1) / MN) * sum_i) histogram equalization
     _=(0...255).map { i in
       // LookUpTable에 변경값 저장
       rLookUpTable[sumData[i].r] = Int(round((255.0 / 65536.0) * Double(sumData[i].n)))
@@ -126,7 +126,8 @@ class MainViewController: UIViewController {
       bLookUpTable[sumData[i].r] = Int(round((255.0 / 65536.0) * Double(sumData[i].n)))
     }
     
-    // 변경(histogram equalization)된 픽셀데이터 생성
+    // 변경(histogram equalization)된 픽셀데이터 LookUpTable에 참조해 업데이트
+    // 여기서 참조되는 pixelData는 원본 이미지영상을 참조한 데이터임
     for i in stride(from: 0, to: pixelData.count, by: 4) {
       pixelData[i] = UInt8(rLookUpTable[Int(exactly: pixelData[i])!]!)
     }
@@ -169,6 +170,7 @@ class MainViewController: UIViewController {
     
     for y in 0..<height {
       for x in 0..<width {
+        // pixelData -> R, G, B, Alpha 값들이 순서대로 보관돼있음
         let offset = (y * width + x) * 4
         let red = pixelData[offset]
         let green = pixelData[offset + 1]
@@ -188,7 +190,6 @@ class MainViewController: UIViewController {
     var sumBHistogram = 0
     
     _=(0..<rHistogram.count).map { i in
-      //
       tempHistData.append(HistDataPoint(r: i, n: rHistogram[i], rgbID: "red"))
       
       // 누적 분포 함수 계산
