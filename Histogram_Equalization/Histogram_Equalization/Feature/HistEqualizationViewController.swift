@@ -28,11 +28,13 @@ class HistEqualizationViewController: UIViewController {
   let histLabel: UILabel = {
     let label = UILabel()
     label.text = "Histogram"
+    label.font = .boldSystemFont(ofSize: 20)
     return label
   }()
   let sumLabel: UILabel = {
     let label = UILabel()
     label.text = "Sum"
+    label.font = .boldSystemFont(ofSize: 20)
     return label
   }()
   var histChartView: ChartView!
@@ -293,4 +295,3 @@ extension HistEqualizationViewController: LayoutSupport {
   }
   
 }
-

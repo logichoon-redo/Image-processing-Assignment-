@@ -10,6 +10,7 @@ import UIKit
 class TabBarController: UITabBarController {
   
   let histEqualizationController = HistEqualizationViewController()
+  let kmeansViewController = KMeansViewController()
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -19,16 +20,9 @@ class TabBarController: UITabBarController {
   
   private func setTabBarItem() {
     histEqualizationController.tabBarItem = UITabBarItem(title: "Hist_Equalization", image: UIImage(systemName: "chart.bar.xaxis.ascending"), tag: 0)
+    kmeansViewController.tabBarItem = UITabBarItem(title: "K-Means", image: UIImage(systemName: "chart.pie.fill"), tag: 1)
     
-    self.viewControllers = [histEqualizationController]
-  }
-  
-}
-
-extension TabBarController {
-  
-  func setTabBarLayout() {
-    
+    self.viewControllers = [histEqualizationController, kmeansViewController]
   }
   
 }
