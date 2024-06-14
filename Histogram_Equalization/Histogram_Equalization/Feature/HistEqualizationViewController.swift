@@ -9,11 +9,11 @@ import SnapKit
 import SwiftUI
 import UIKit
 
-class MainViewController: UIViewController {
+class HistEqualizationViewController: UIViewController {
   
   // MARK: - Properties
   // UI Properties
-  let mainImageView: UIImageView = {
+  let histImageView: UIImageView = {
     let imageView = UIImageView()
     imageView.image = UIImage(named: "test image")
     return imageView
@@ -83,7 +83,7 @@ class MainViewController: UIViewController {
   
   @objc func tappedEqualButton() {
     guard let cgImage = self.histogramEqualization() else { print("image nil"); return }
-    self.mainImageView.image = UIImage(cgImage: cgImage)
+    self.histImageView.image = UIImage(cgImage: cgImage)
     self.equalButton.setTitle("Successful! 🎯", for: .normal)
   }
   
@@ -120,7 +120,6 @@ class MainViewController: UIViewController {
     }
     
     // 변경(histogram equalization)된 픽셀데이터 LookUpTable에 참조해 업데이트
-    // 여기서 참조되는 pixelData는 원본 이미지영상을 참조한 데이터임
     _=(0..<self.yCbCrPixelData.count).map { i in
       self.yCbCrPixelData[i].y = UInt8(lookUpTable[Int(self.yCbCrPixelData[i].y)])
     }
@@ -162,11 +161,11 @@ class MainViewController: UIViewController {
     }
     
     _=(0...255).map { i in
-      tempHistData.append(HistDataPoint(r: i, n: histogram[i], rgbID: "y"))
+      tempHistData.append(HistDataPoint(r: i, n: histogram[i], rgbID: "YCbCr"))
       
       // 누적 분포 함수 계산
       histogramSum += histogram[i]
-      tempSumData.append(HistDataPoint(r: i, n: histogramSum, rgbID: "y"))
+      tempSumData.append(HistDataPoint(r: i, n: histogramSum, rgbID: "YCbCr"))
     }
     
     // Chart Update (didSet 실행)
@@ -232,7 +231,7 @@ class MainViewController: UIViewController {
 
 // MARK: - LayoutSupport
 
-extension MainViewController: LayoutSupport {
+extension HistEqualizationViewController: LayoutSupport {
   
   func configureSubviews() {
     addSubviews()
@@ -240,7 +239,7 @@ extension MainViewController: LayoutSupport {
   }
   
   func addSubviews() {
-    self.view.addSubview(self.mainImageView)
+    self.view.addSubview(self.histImageView)
     
     addChild(self.histHostingController)
     self.view.addSubview(self.histHostingController.view)
@@ -256,28 +255,28 @@ extension MainViewController: LayoutSupport {
   }
   
   func setupSubviewsConstraints() {
-    self.mainImageView.snp.makeConstraints {
+    self.histImageView.snp.makeConstraints {
       $0.centerX.equalToSuperview()
-      $0.top.equalToSuperview().offset(90)
+      $0.top.equalToSuperview().offset(60)
     }
     
     self.histHostingController.view.snp.makeConstraints {
       $0.centerX.equalToSuperview()
-      $0.top.equalTo(self.mainImageView.snp.bottom).offset(40)
+      $0.top.equalTo(self.histImageView.snp.bottom).offset(30)
       $0.height.equalTo(150)
       $0.width.equalTo(250)
     }
     
     self.sumHostingController.view.snp.makeConstraints {
       $0.centerX.equalToSuperview()
-      $0.top.equalTo(self.histHostingController.view.snp.bottom).offset(40)
+      $0.top.equalTo(self.histHostingController.view.snp.bottom).offset(30)
       $0.height.equalTo(150)
       $0.width.equalTo(250)
     }
     
     self.equalButton.snp.makeConstraints {
       $0.centerX.equalToSuperview()
-      $0.top.equalTo(self.sumHostingController.view.snp.bottom).offset(30)
+      $0.top.equalTo(self.sumHostingController.view.snp.bottom).offset(20)
       $0.height.equalTo(50)
       $0.width.equalTo(200)
     }

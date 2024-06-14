@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4B34257D2BEA487700B27D9F /* YCbCrItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B34257C2BEA487700B27D9F /* YCbCrItem.swift */; };
+		4B5190B02C1C2FE000F32B11 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5190AF2C1C2FE000F32B11 /* TabBarController.swift */; };
 		4B7F769A2BC27395000DB894 /* Charts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B7F76992BC27395000DB894 /* Charts.framework */; };
 		4B7F769C2BC273B0000DB894 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7F769B2BC273B0000DB894 /* ChartView.swift */; };
 		4B7F769E2BC27638000DB894 /* HistDataPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7F769D2BC27638000DB894 /* HistDataPoint.swift */; };
@@ -16,7 +18,7 @@
 		4BAFE2C22BC26718000DC117 /* SnapKit-Dynamic in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 4BAFE2C02BC26718000DC117 /* SnapKit-Dynamic */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		4BCF42F02BC1C7A600217F7E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF42EF2BC1C7A600217F7E /* AppDelegate.swift */; };
 		4BCF42F22BC1C7A600217F7E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF42F12BC1C7A600217F7E /* SceneDelegate.swift */; };
-		4BCF42F42BC1C7A600217F7E /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF42F32BC1C7A600217F7E /* MainViewController.swift */; };
+		4BCF42F42BC1C7A600217F7E /* HistEqualizationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF42F32BC1C7A600217F7E /* HistEqualizationViewController.swift */; };
 		4BCF42F92BC1C7A700217F7E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4BCF42F82BC1C7A700217F7E /* Assets.xcassets */; };
 		4BCF43072BC1C7A700217F7E /* Histogram_EqualizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF43062BC1C7A700217F7E /* Histogram_EqualizationTests.swift */; };
 		4BCF43112BC1C7A700217F7E /* Histogram_EqualizationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF43102BC1C7A700217F7E /* Histogram_EqualizationUITests.swift */; };
@@ -55,6 +57,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4B34257C2BEA487700B27D9F /* YCbCrItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YCbCrItem.swift; sourceTree = "<group>"; };
+		4B5190AF2C1C2FE000F32B11 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		4B7F76992BC27395000DB894 /* Charts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Charts.framework; path = System/Library/Frameworks/Charts.framework; sourceTree = SDKROOT; };
 		4B7F769B2BC273B0000DB894 /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
 		4B7F769D2BC27638000DB894 /* HistDataPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistDataPoint.swift; sourceTree = "<group>"; };
@@ -62,7 +66,7 @@
 		4BCF42EC2BC1C7A600217F7E /* Histogram_Equalization.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Histogram_Equalization.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BCF42EF2BC1C7A600217F7E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4BCF42F12BC1C7A600217F7E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		4BCF42F32BC1C7A600217F7E /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		4BCF42F32BC1C7A600217F7E /* HistEqualizationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistEqualizationViewController.swift; sourceTree = "<group>"; };
 		4BCF42F82BC1C7A700217F7E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4BCF42FD2BC1C7A700217F7E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4BCF43022BC1C7A700217F7E /* Histogram_EqualizationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Histogram_EqualizationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -116,7 +120,8 @@
 			children = (
 				4B7F769B2BC273B0000DB894 /* ChartView.swift */,
 				4B7F769D2BC27638000DB894 /* HistDataPoint.swift */,
-				4BCF42F32BC1C7A600217F7E /* MainViewController.swift */,
+				4BCF42F32BC1C7A600217F7E /* HistEqualizationViewController.swift */,
+				4B34257C2BEA487700B27D9F /* YCbCrItem.swift */,
 			);
 			path = Feature;
 			sourceTree = "<group>";
@@ -125,6 +130,7 @@
 			isa = PBXGroup;
 			children = (
 				4BAFE2BC2BC266D4000DC117 /* LayoutSupport.swift */,
+				4B5190AF2C1C2FE000F32B11 /* TabBarController.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -322,7 +328,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4BCF42F42BC1C7A600217F7E /* MainViewController.swift in Sources */,
+				4B34257D2BEA487700B27D9F /* YCbCrItem.swift in Sources */,
+				4B5190B02C1C2FE000F32B11 /* TabBarController.swift in Sources */,
+				4BCF42F42BC1C7A600217F7E /* HistEqualizationViewController.swift in Sources */,
 				4B7F769E2BC27638000DB894 /* HistDataPoint.swift in Sources */,
 				4BAFE2BD2BC266D4000DC117 /* LayoutSupport.swift in Sources */,
 				4BCF42F02BC1C7A600217F7E /* AppDelegate.swift in Sources */,
