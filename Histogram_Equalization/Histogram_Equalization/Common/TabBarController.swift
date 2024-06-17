@@ -10,7 +10,7 @@ import UIKit
 class TabBarController: UITabBarController {
   
   let histEqualizationController = HistEqualizationViewController()
-  let kmeansViewController = KMeansViewController()
+  let kmeansViewController = KmeansViewController()
   
   override func viewDidLoad() {
     super.viewDidLoad()
