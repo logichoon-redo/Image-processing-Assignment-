@@ -108,7 +108,7 @@ class KmeansViewController: UIViewController {
       
       // 4. 클러스터의 M_i 변화값 임계치 보다 작으면 종료
       // centroid의 변화 distance(크기)를 구함 -> diff 유클리드 거리 변화량
-      var diff = 0.0
+      var diff = 0.0 // 유클리드 변화량 합계
       for i in 0..<k {
         diff += euclideanDistance(a: centroids[i], b: newCentroids[i])
       }
@@ -237,8 +237,8 @@ class KmeansViewController: UIViewController {
     for y in 0..<height {
       for x in 0..<width {
         let offset = (y * width + x) * bytesPerPixel // 4씩 이동하는 index이기 때문에 bytesPerPixel 곱함
-        let clusterIndex = clusters[y * width + x]
-        let centroid = centroids[clusterIndex]
+        let centroidIndex = clusters[y * width + x]
+        let centroid = centroids[centroidIndex]
         
         // centroid의 RGBPoint값으로 할당함
         pixelData[offset] = UInt8(centroid.r * 255.0)
