@@ -3,12 +3,87 @@
 ### Histogram Equalization
 <img width="445" alt="스크린샷 2024-05-08 오후 4 41 29" src="https://github.com/logichoon-redo/Image-processing-Assignment-/assets/117021317/c24ae8ed-1419-4bb2-8c01-def889ef09fa">
 
+> YCbCr 밝기 값릐 픽셀 수를 구해 histogram 지역 변수에 담고 있습니다.
+> histogram를 tempHistData에 담으면서 데이터 합을 구해 누적분포함수를 나타내는 데이터를 만들고있습니다.
+> 완성된 tempHistData, tempSumData를 전역 변수에 담으면 didSet이 발동되고 ChartView를 새롭게 그리고있습니다.
+> 이 함수는 initHistogram()을 실행 할 때 호출되는데, 원본 이미지의 histogram 및 누적분포함수의 그래프를 그리기 위해서입니다.
 
+```swift
+func createHistAndSum(pixelData: [UInt8], height: Int, width: Int) {
+    var histogram = [Int](repeating: 0, count: 256)
+    var histogramSum = 0
+    var tempHistData = [HistDataPoint]()
+    var tempSumData = [HistDataPoint]()
+    
+    self.yCbCrPixelData = self.changeRGBtoYCbCr(pixelData: pixelData, height: height, width: width)
+    
+    _=self.yCbCrPixelData.map {
+      histogram[Int($0.y)] += 1
+    }
+    
+    _=(0...255).map { i in
+      tempHistData.append(HistDataPoint(r: i, n: histogram[i], rgbID: "YCbCr"))
+      
+      // 누적 분포 함수 계산
+      histogramSum += histogram[i]
+      tempSumData.append(HistDataPoint(r: i, n: histogramSum, rgbID: "YCbCr"))
+    }
+    
+    // Chart Update (didSet 실행)
+    self.histData = tempHistData
+    self.sumData = tempSumData
+    }
+```
+
+<br/>
+
+> LookUpTable에 픽셀의 밝기 값별로 평탄화될 밝기 값을 계산하고 있습니다.
+> 여기서 픽셀의 밝기 값은 lookUpTable[i]로 나타내고 있으며, 평탄화될 발기 값은 `Int(round((255.0 / 65536.0) * Double(self.sumData[i].n)))`연산에 의해 결정됩니다.
+> 평탄화된 YCbCr Data를 다시 그릴 때는 LookUpTable의 index를 참조해 평탄화된 밝기 값을 얻어옵니다.
+> 이 함수에서도 역시 createHistAndSum()를 사용해 평탄화된 이미지의 histogram 및 누적분포함수의 그래프를 그리고 있습니다.
+
+```swift
+func histogramEqualization() -> CGImage? {
+    // round(((L - 1) / MN) * sum_i) histogram equalization
+    _=(0...255).map { i in
+      // LookUpTable에 변경값 저장
+      self.lookUpTable[i] = Int(round((255.0 / 65536.0) * Double(self.sumData[i].n)))
+    }
+    
+    // 변경(histogram equalization)된 픽셀데이터 LookUpTable에 참조해 업데이트
+    _=(0..<self.yCbCrPixelData.count).map { i in
+      self.yCbCrPixelData[i].y = UInt8(lookUpTable[Int(self.yCbCrPixelData[i].y)])
+    }
+    
+    self.pixelData = changeYCbCrtoRGB(yCbCrPixelData: self.yCbCrPixelData)
+    
+    self.createHistAndSum(pixelData: pixelData, height: 256, width: 256)
+    
+    // CG이미지 생성
+    guard let providerRef = CGDataProvider(data: Data(pixelData) as CFData) else { print("no data"); return nil }
+    
+    let cgImgae = CGImage(width: 256,
+                          height: 256,
+                          bitsPerComponent: 8,
+                          bitsPerPixel: 4 * 8,
+                          bytesPerRow: 4 * 256,
+                          space: CGColorSpaceCreateDeviceRGB(),
+                          bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue),
+                          provider: providerRef,
+                          decode: nil,
+                          shouldInterpolate: true,
+                          intent: .defaultIntent)
+    
+    return cgImgae
+  }
+```
+
+<br/><br/>
 
 ### K-Means Algorithm
 <img width="445" alt="스크린샷 2024-05-08 오후 4 41 29" src="https://github.com/logichoon-redo/Image-processing-Assignment-/blob/6b92285e4052be80bff0bf1e3942ea73003fd690/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA%202024-06-22%20%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB%2010.55.18.png">
 
-
+<br/><br/>
 
 # Public Function
 
