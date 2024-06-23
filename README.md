@@ -86,6 +86,8 @@ func histogramEqualization() -> CGImage? {
 ### K-Means Algorithm
 <img width="445" alt="스크린샷 2024-05-08 오후 4 41 29" src="https://github.com/logichoon-redo/Image-processing-Assignment-/blob/6b92285e4052be80bff0bf1e3942ea73003fd690/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA%202024-06-22%20%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB%2010.55.18.png">
 
+> centroid(중앙 값)을 초기화하고 있습니다. 일반적으로 0 혹은 랜덤값을 초기화하지만 이 코드에선 랜덤 값으로 초기화 하되 index가 겹치지 않게 구현해 좀 더 효율적으로 만들었습니다.
+
 ```swift
 func initializeCentroids(points: [RGBPoint], k: Int) -> [RGBPoint] {
     var centroids = [RGBPoint]()
@@ -105,6 +107,9 @@ func initializeCentroids(points: [RGBPoint], k: Int) -> [RGBPoint] {
 ```
 
 <br/>
+
+> 픽셀의 index를 순회하면서 centroid의 euclideanDistance를 구하고 있습니다.
+> euclideanDistance가 가장 짧았던 centroid를 참조하도록 clusters 변수에 담고 있습니다.
 
 ```swift
 func assignClusters(pointS: [RGBPoint], centroids: [RGBPoint]) -> [Int] {
@@ -133,6 +138,9 @@ func assignClusters(pointS: [RGBPoint], centroids: [RGBPoint]) -> [Int] {
 
 <br/>
 
+> 픽셀의 밝기값을 클러스터별로 모아 sum을 구하고 있습니다.
+> 이렇게 구해진 sum은 sample의 개수인 count로 나누면 새로운 centroid 값을 얻을 수 있습니다.
+
 ```swift
 func updateCentroids(points: [RGBPoint], clusters: [Int], k: Int) -> [RGBPoint] {
     var newCentroids = Array(repeating: RGBPoint(r: 0, g: 0, b: 0), count: k)
@@ -159,6 +167,58 @@ func updateCentroids(points: [RGBPoint], clusters: [Int], k: Int) -> [RGBPoint] 
 ```
 
 <br/>
+
+> 유클리드 거리를 계산하는 함수입니다.
+> 식 `||Z_i - M_i||^2 = sqrt((Z_1 - M_i1)^2 + (Z_2 - M_i2)^2)`을 나타내고 있습니다.
+
+```swift
+func euclideanDistance(a: RGBPoint, b: RGBPoint) -> Double {
+    // ||Z_i - M_i||^2 = sqrt((Z_1 - M_i1)^2 + (Z_2 - M_i2)^2)
+    return sqrt(pow(a.r - b.r, 2) + pow(a.g - b.g, 2) + pow(a.b - b.b, 2))
+  }
+```
+
+<br/>
+
+> 1. centroid를 랜덤 한 픽셀의 밝기 값으로 초기화합니다.
+> 2. 각 픽셀마다 centroid와의 유클리드 거리를 계산해 유클리드 거리가 짧은 centroid를 참조하는 cluster를 생성합니다.
+> 3. centroid 값을 이전에 만든 cluster를 반영해 update 합니다.
+> 4. k개의 clusters의 유클리드 총 변화량을 측정하고 이 변화량 임계치 tol보다 작으면 프로그램을 종료하고 assignClusters()를 마지막으로 한 번 더 실행한 후 cluster로 이미지를 만듭니다. (그렇지 않을 경우 2번 부터 반복...)
+
+```swift
+func kmeans(points: [RGBPoint],
+              k: Int,
+              maxLoop: Int = 100,
+              tol: Double = 1e-4) -> ([RGBPoint], [Int]) {
+    // 1. random 값으로 초기 중심 선택
+    var centroids = initializeCentroids(points: points, k: k)
+    
+    for _ in 0..<maxLoop {
+      // 2. ||Z_i - M_i||^2 < ||Z_j - M_j||^2 일 때 Z_i -> S_i
+      // 각 포인트를 가장 가까운 클러스터에 할당 -> 픽셀마다 가까운 centroid index값을 저장
+      let clusters = assignClusters(pointS: points, centroids: centroids)
+      
+      // 3. M_i = sum(Z) / S_i
+      // cluster 중심 업데이트
+      let newCentroids = updateCentroids(points: points, clusters: clusters, k: k)
+      
+      // 4. 클러스터의 M_i 변화값 임계치 보다 작으면 종료
+      // centroid의 변화 distance(크기)를 구함 -> diff 유클리드 거리 변화량
+      var diff = 0.0 // 유클리드 변화량 합계
+      for i in 0..<k {
+        diff += euclideanDistance(a: centroids[i], b: newCentroids[i])
+      }
+      // 변화량이 임계치T보다 작으면 알고리즘 종료
+      if diff < tol { break }
+      
+      // 실제로 centroids값이 update
+      centroids = newCentroids
+    }
+    
+    let finalClusters = assignClusters(pointS: points, centroids: centroids)
+    return (centroids, finalClusters)
+  }
+```
 
 <br/><br/>
 
