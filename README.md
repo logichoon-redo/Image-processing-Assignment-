@@ -1,7 +1,10 @@
 # Image Processing Assignment
 
 ### Histogram Equalization
+
 <img width="445" alt="스크린샷 2024-05-08 오후 4 41 29" src="https://github.com/logichoon-redo/Image-processing-Assignment-/assets/117021317/c24ae8ed-1419-4bb2-8c01-def889ef09fa">
+
+<br/>
 
 > YCbCr 밝기 값릐 픽셀 수를 구해 histogram 지역 변수에 담고 있습니다.
 > histogram를 tempHistData에 담으면서 데이터 합을 구해 누적분포함수를 나타내는 데이터를 만들고있습니다.
@@ -82,6 +85,80 @@ func histogramEqualization() -> CGImage? {
 
 ### K-Means Algorithm
 <img width="445" alt="스크린샷 2024-05-08 오후 4 41 29" src="https://github.com/logichoon-redo/Image-processing-Assignment-/blob/6b92285e4052be80bff0bf1e3942ea73003fd690/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA%202024-06-22%20%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB%2010.55.18.png">
+
+```swift
+func initializeCentroids(points: [RGBPoint], k: Int) -> [RGBPoint] {
+    var centroids = [RGBPoint]()
+    var usedIndex = Set<Int>()
+    
+    // usedIndex에 설정한 밝기값을 보관하여 밝기값 중복을 방지하고 있음
+    while centroids.count < k {
+      let index = Int.random(in: 0..<points.count) // random한 pixel의 index를 고름
+      if !usedIndex.contains(index) { // 이미 선택한 index이면 append하지 않음
+        centroids.append(points[index])
+        usedIndex.insert(index)
+      }
+    }
+    
+    return centroids
+  }
+```
+
+<br/>
+
+```swift
+func assignClusters(pointS: [RGBPoint], centroids: [RGBPoint]) -> [Int] {
+    var clusters = [Int]()
+    
+    for point in pointS {
+      var minDistance = Double.greatestFiniteMagnitude
+      var closestCentroidIndex = 0
+      
+      // point를 centroid마다 유클리드거리를 계산하고 가장 짧은 유클리드 거리의 index를 추출하고
+      for (index, centroid) in centroids.enumerated() {
+        let distance = euclideanDistance(a: point, b: centroid)
+        if distance < minDistance {
+          minDistance = distance
+          closestCentroidIndex = index
+        }
+      }
+      // index를 clusters 배열에 저장 -> clusters의 index와 pixel의 index는 같음
+      // pixel이 가르켜야 할 centroid의 index 저장
+      clusters.append(closestCentroidIndex)
+    }
+    
+    return clusters
+  }
+```
+
+<br/>
+
+```swift
+func updateCentroids(points: [RGBPoint], clusters: [Int], k: Int) -> [RGBPoint] {
+    var newCentroids = Array(repeating: RGBPoint(r: 0, g: 0, b: 0), count: k)
+    var counts = Array(repeating: 0, count: k) // S_i sample 수
+    
+    // pixel의 밝기값을 클러스터집합에 누적합을 구하는 코드 & S_i를 구하는 코드
+    // pixel index, centroid index
+    for (index, cluster) in clusters.enumerated() {
+      newCentroids[cluster].r += points[index].r
+      newCentroids[cluster].g += points[index].g
+      newCentroids[cluster].b += points[index].b
+      counts[cluster] += 1
+    }
+    
+    // sum(z) / S_i
+    for i in 0..<k {
+      newCentroids[i].r /= Double(counts[i])
+      newCentroids[i].g /= Double(counts[i])
+      newCentroids[i].b /= Double(counts[i])
+    }
+    
+    return newCentroids
+  }
+```
+
+<br/>
 
 <br/><br/>
 
