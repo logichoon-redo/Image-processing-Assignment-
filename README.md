@@ -6,7 +6,7 @@
 
 <br/>
 
-> YCbCr 밝기 값릐 픽셀 수를 구해 histogram 지역 변수에 담고 있습니다.
+> YCbCr 밝기 값의 픽셀 수를 구해 histogram 지역 변수에 담고 있습니다.
 > histogram를 tempHistData에 담으면서 데이터 합을 구해 누적분포함수를 나타내는 데이터를 만들고있습니다.
 > 완성된 tempHistData, tempSumData를 전역 변수에 담으면 didSet이 발동되고 ChartView를 새롭게 그리고있습니다.
 > 이 함수는 initHistogram()을 실행 할 때 호출되는데, 원본 이미지의 histogram 및 누적분포함수의 그래프를 그리기 위해서입니다.
